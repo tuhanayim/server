@@ -1,0 +1,55 @@
+{
+	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+
+	log {
+		output stdout
+		format console
+	}
+}
+
+caddy.tuhana.me {
+	encode gzip
+
+	log {
+		output file {env.LOGS_FOLDER}/caddy-admin.log {
+			roll_size 10
+		}
+	}
+
+	reverse_proxy localhost:2019
+}
+
+vault.tuhana.me {
+	encode gzip
+
+	log {
+		output file {env.LOGS_FOLDER}/vaultwarden.log {
+			roll_size 10
+		}
+	}
+
+	header / {
+		Strict-Transport-Security "max-age=31536000;"
+		X-XSS-Protection "1; mode=block"
+		X-Frame-Options "DENY"
+		X-Robots-Tag "none"
+		-Server
+	}
+
+	reverse_proxy /notifications/hub vaultwarden:3012
+	reverse_proxy vaultwarden:80 {
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+me.cok.gay {
+	encode gzip
+
+	log {
+		output file {env.LOGS_FOLDER}/me.log {
+			roll_size 10
+		}
+	}
+
+	reverse_proxy me:4201
+}

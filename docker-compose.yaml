@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  caddy:
+    container_name: caddy
+    image: ghcr.io/tuhanayim/caddy:latest
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_config:/config
+      - caddy_data:/data
+    ports:
+      - 80:80
+      - 443:433
+      - 443:443/udp
+    env_file:
+      - .caddy.env
+
+  vaultwarden:
+    container_name: vaultwarden
+    image: docker.io/vaultwarden/server:latest
+    volumes:
+      - vaultwarden_data:/data
+    env_file:
+      - .vaultwarden.env
+
+  me:
+    container_name: me
+    image: ghcr.io/cokgay/me:main
+    env_file:
+       - .me.env
+
+volumes:
+  caddy_config:
+  caddy_data:
+  vaultwarden_data:
